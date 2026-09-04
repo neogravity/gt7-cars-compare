@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- gran-turismo.com blocks thumbnail hotlinks by Referer; send none so its CDN serves them (works on GitHub Pages). -->
+<meta name="referrer" content="no-referrer">
 <title>GT7 Gr.1–4 Compare</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -620,7 +622,7 @@ function render(){
     const tr = document.createElement('tr');
     tr.className = state.checked.has(c.id) ? 'checked' : '';
     const iu = imgUrl(c), fb = imgFallbackUrl(c);
-    const imgCell = `<img class="thumb" src="${iu}" alt="${c.name}" loading="lazy" onerror="this.onerror=null;this.src='${fb}';this.onerror=function(){this.replaceWith(Object.assign(document.createElement('div'),{className:'thumb-ph',textContent:'no image'}))};">`;
+    const imgCell = `<img class="thumb" src="${iu}" alt="${c.name}" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='${fb}';this.onerror=function(){this.replaceWith(Object.assign(document.createElement('div'),{className:'thumb-ph',textContent:'no image'}))};">`;
     const dispCell = c.disp!=null ? c.disp+' cc' : '<span class="na">—</span>';
     const powerCell = `${c.hp} HP<br><span class="manu-name">/ ${c.powerRpm.toLocaleString()} rpm</span>`;
     const torqueCell = `${c.torqueFtLb.toFixed(1)} ft-lb<br><span class="manu-name">/ ${c.torqueRpm.toLocaleString()} rpm · ${c.torqueNm.toFixed(1)} Nm</span>`;
@@ -669,7 +671,7 @@ function render(){
 // shared per-car rendered values (used by the grid cards)
 function imgCellHtml(c){
   const iu = imgUrl(c), fb = imgFallbackUrl(c);
-  return `<img class="thumb" src="${iu}" alt="${c.name}" loading="lazy" onerror="this.onerror=null;this.src='${fb}';this.onerror=function(){this.replaceWith(Object.assign(document.createElement('div'),{className:'thumb-ph',textContent:'no image'}))};">`;
+  return `<img class="thumb" src="${iu}" alt="${c.name}" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='${fb}';this.onerror=function(){this.replaceWith(Object.assign(document.createElement('div'),{className:'thumb-ph',textContent:'no image'}))};">`;
 }
 
 function renderGrid(list){
@@ -764,7 +766,7 @@ document.getElementById('compareBtn').addEventListener('click', ()=>{
   ];
   const imgRow = '<tr><td>Image</td>' + cars.map(c=>{
     const iu = imgUrl(c), fb = imgFallbackUrl(c);
-    return `<td><img class="thumb" style="width:120px;height:75px;" src="${iu}" onerror="this.onerror=null;this.src='${fb}';"></td>`;
+    return `<td><img class="thumb" style="width:120px;height:75px;" src="${iu}" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='${fb}';"></td>`;
   }).join('') + '</tr>';
   let html = '<tr><th>Spec</th>' + cars.map(c=>`<th>${c.name}</th>`).join('') + '</tr>' + imgRow;
   rows.forEach(([label, fn])=>{

@@ -166,6 +166,17 @@ See [`HANDOVER.md`](HANDOVER.md) for the gotchas (silent ~995-char truncation of
 - **`getFiltered()` / `render()`** — filter + sort, then dispatch to `renderList()` or `renderGrid()`.
 - **Column visibility** — every `<th>`/`<td>` and every grid card field carries a `col-<id>` class; `applyColVisibility()` toggles a `.col-hidden` (`display:none !important`) utility across both views. The `!important` matters: the grid card's `.card-specs > div { display:flex }` rule otherwise out-specifies a plain `.col-hidden`.
 - **`imgUrl()` / `imgFallbackUrl()`** — build the two candidate thumbnail URLs from `carId`, with an `onerror` chain that falls back to the hero image and finally a "no image" placeholder.
+
+### Thumbnails & hotlink protection
+
+Thumbnails are loaded directly from `gran-turismo.com`. Its CDN **blocks hotlinking by `Referer`**: a request carrying a `github.io` (or other third-party) referrer gets a `403`, while a request with **no referrer** is served normally. That's why images render when you open the file locally (`file://` sends no referrer) but *broke* on GitHub Pages until this was fixed.
+
+The fix is to send no referrer for image requests:
+
+- A page-level `<meta name="referrer" content="no-referrer">` in `<head>`, plus
+- `referrerpolicy="no-referrer"` on each `<img>` (belt-and-suspenders, and it also covers the dynamically-swapped `onerror` fallback source).
+
+If Polyphony ever tightens this to also reject empty-referrer requests, the fallback plan is to **self-host** the thumbnails: download `car{id}.png` for the 121 cars into an `images/` folder and point `imgUrl()` at the local path. That removes the external dependency entirely at the cost of ~4–5 MB of images in the repo.
 - **Compare tray/modal** — pins up to 4 cars via checkboxes and builds the side-by-side spec table on demand.
 - **Persistence** — view mode (`gt7-view`) and hidden columns (`gt7-hidden-cols`) are stored in `localStorage`; all storage access is wrapped in `try/catch` so the app degrades gracefully where storage is unavailable (e.g. `data:`-URL sandboxes).
 
@@ -185,9 +196,11 @@ See [`HANDOVER.md`](HANDOVER.md) for the gotchas (silent ~995-char truncation of
 Ideas, not commitments:
 
 - A small Node/Playwright script to automate the extraction and refresh after patches.
-- Split the dataset into a standalone `cars.json` so data can be updated independently of the UI.
-- Optionally split the single HTML into `index.html` / `styles.css` / `data.js` / `app.js` for easier diffs (single-file portability is currently intentional).
+- Optionally self-host the thumbnails (see [Thumbnails & hotlink protection](#thumbnails--hotlink-protection)) to drop the runtime dependency on `gran-turismo.com` entirely.
+- Optionally split the app itself into `index.html` / `styles.css` / `app.js` for easier diffs.
 - Extend coverage to Gr.B / Sport / Super Formula.
+
+> ✅ Done: the dataset is already separated into [`cars.js`](cars.js).
 
 ---
 

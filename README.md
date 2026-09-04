@@ -59,7 +59,9 @@ There is no toolchain. Everything (data, CSS, JavaScript) is inline in one HTML 
 - One-click **Reset filters**.
 
 ### Sorting
-- Click any List-view column header to sort ascending/descending. Sort state carries into Grid view.
+- **List view**: click any column header to sort ascending/descending.
+- **Grid view**: use the **Sort** dropdown + direction toggle (grid has no headers to click).
+- Both drive the same sort state, so it stays consistent when you switch views.
 
 ### Compare
 - Check up to **4 cars** to pin them to the compare tray, then open a **side-by-side modal** with a full spec breakdown (including a computed **power-to-weight** row).

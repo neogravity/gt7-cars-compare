@@ -145,6 +145,16 @@
   /* view toggle */
   .count-line-row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px;}
   .count-line-row .count-line{margin:0;}
+  .controls-right{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  .sort-control{display:none;align-items:center;gap:7px;}
+  .sort-control.show{display:flex;}
+  .sort-control label{font-family:'Oswald',sans-serif;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--sub2);}
+  .sort-control select{padding:7px 10px;font-size:12px;}
+  .sort-control #sortDirBtn{
+    background:var(--panel2);border:1px solid var(--line);color:var(--text);
+    border-radius:4px;padding:7px 11px;font-size:12px;cursor:pointer;line-height:1;font-family:'Roboto Mono',monospace;
+  }
+  .sort-control #sortDirBtn:hover{border-color:var(--accent);color:var(--accent);}
   .view-toggle{display:flex;border:1px solid var(--line);border-radius:4px;overflow:hidden;flex-shrink:0;}
   .view-toggle button{
     background:var(--panel2);border:none;color:var(--sub);padding:7px 15px;
@@ -304,10 +314,17 @@
   </div>
 
   <div class="count-line-row">
-    <p class="count-line">Showing <b id="countShown">0</b> of <b id="countTotal">0</b> cars — click any column header to sort, check rows to compare.</p>
-    <div class="view-toggle" id="viewToggle">
-      <button data-view="list" class="active">▤ List</button>
-      <button data-view="grid">▦ Grid</button>
+    <p class="count-line">Showing <b id="countShown">0</b> of <b id="countTotal">0</b> cars — sort via a column header (List) or the Sort menu (Grid), check rows to compare.</p>
+    <div class="controls-right">
+      <div class="sort-control" id="sortControl">
+        <label for="sortSelect">Sort</label>
+        <select id="sortSelect"></select>
+        <button id="sortDirBtn" title="Toggle ascending / descending">▼</button>
+      </div>
+      <div class="view-toggle" id="viewToggle">
+        <button data-view="list" class="active">▤ List</button>
+        <button data-view="grid">▦ Grid</button>
+      </div>
     </div>
   </div>
 
@@ -316,7 +333,7 @@
       <thead>
         <tr>
           <th class="chk"></th>
-          <th class="col-g" data-key="g">Group <span class="arrow"></span></th>
+          <th class="col-g" data-key="grp">Group <span class="arrow"></span></th>
           <th class="img-th col-img"></th>
           <th class="col-m" data-key="m">Manufacturer / Model <span class="arrow"></span></th>
           <th class="col-dt" data-key="dt">Drive <span class="arrow"></span></th>
@@ -329,7 +346,7 @@
           <th class="num col-wid" data-key="widMm">Width <span class="arrow"></span></th>
           <th class="num col-hei" data-key="heiMm">Height <span class="arrow"></span></th>
           <th class="num col-pp" data-key="pp">PP <span class="arrow"></span></th>
-          <th class="num col-pr" data-key="pr">Price <span class="arrow"></span></th>
+          <th class="num col-pr" data-key="price">Price <span class="arrow"></span></th>
         </tr>
       </thead>
       <tbody id="tbody"></tbody>
@@ -553,6 +570,36 @@ viewToggle.querySelectorAll('button').forEach(b=>{
 });
 syncViewButtons();
 
+// sort control (used mainly in grid view, where there are no clickable headers)
+const SORT_FIELDS = [
+  ['grp','Group'],
+  ['m','Manufacturer / Model'],
+  ['dt','Drive'],
+  ['asp','Aspiration'],
+  ['disp','Displacement'],
+  ['hp','Max Power'],
+  ['torqueFtLb','Max Torque'],
+  ['wt','Weight'],
+  ['lenMm','Length'],
+  ['widMm','Width'],
+  ['heiMm','Height'],
+  ['pp','PP'],
+  ['price','Price'],
+];
+const sortSelect = document.getElementById('sortSelect');
+const sortDirBtn = document.getElementById('sortDirBtn');
+SORT_FIELDS.forEach(([key,label])=>{
+  const o = document.createElement('option'); o.value=key; o.textContent=label; sortSelect.appendChild(o);
+});
+function syncSortControl(){
+  sortSelect.value = state.sortKey;
+  sortDirBtn.textContent = state.sortDir===1 ? '▲' : '▼';
+  sortDirBtn.title = state.sortDir===1 ? 'Ascending — click for descending' : 'Descending — click for ascending';
+  document.getElementById('sortControl').classList.toggle('show', state.view==='grid');
+}
+sortSelect.addEventListener('change', ()=>{ state.sortKey = sortSelect.value; render(); });
+sortDirBtn.addEventListener('click', ()=>{ state.sortDir *= -1; render(); });
+
 function fmtPrice(p){ return "Cr. " + p.toLocaleString(); }
 
 function getFiltered(){
@@ -589,6 +636,7 @@ function render(){
     th.classList.toggle('sorted', th.dataset.key===k);
     th.querySelector('.arrow').textContent = th.dataset.key===k ? (d===1?'▲':'▼') : '';
   });
+  syncSortControl();
 
   const tableScroll = document.getElementById('tableScroll');
   const gridEl = document.getElementById('grid');

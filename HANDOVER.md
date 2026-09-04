@@ -36,9 +36,9 @@ All spec data (displacement, drivetrain, max power w/ RPM, max torque w/ RPM, we
 
 ## File structure
 
-Currently just one file: `index.html`. Everything (data, CSS, JS) is inline.
+Two files: `index.html` (UI, CSS, and app logic) and `cars.js` (the dataset). `cars.js` assigns `window.RAW` and is loaded via `<script src="cars.js">` before the inline app script in `index.html`.
 
-### `RAW` array (top of the `<script>` block)
+### `RAW` array (in `cars.js`, exposed as `window.RAW`)
 Each row is a fixed-order array — **not** an object — for compactness:
 ```
 [0]  name              (string, display name, may omit manufacturer)

@@ -85,20 +85,21 @@ Your view and column preferences are saved locally in your browser, so they pers
 
 ```
 .
-├── index.html         # The entire application (data + CSS + JS, inline)
+├── index.html         # The application — UI, CSS, and app logic
+├── cars.js            # The dataset (window.RAW), separated for easy updates
 ├── README.md          # This file
 ├── HANDOVER.md        # Deep-dive developer notes on how the data was extracted
 ├── LICENSE            # MIT (code) + game-data attribution note
 └── .gitignore
 ```
 
-Everything lives in [`index.html`](index.html). It was kept as a single file deliberately, for maximum portability (email it, drop it on a USB stick, host it as a static asset — it just works). The `index.html` name also means [GitHub Pages](https://neogravity.github.io/gt7-cars-compare/) serves it as the site root.
+The app is [`index.html`](index.html); the data lives in [`cars.js`](cars.js), which assigns `window.RAW` and is loaded via a `<script src="cars.js">` tag before the app code. This keeps the two concerns separate while staying **fully static and dependency-free** — it works both when served over HTTP ([GitHub Pages](https://neogravity.github.io/gt7-cars-compare/) serves `index.html` as the site root) *and* when you just double-click `index.html` from disk (`file://`). A `.js` data file is used rather than `.json` precisely so `file://` keeps working — browsers block `fetch()` of a local JSON file, but a `<script src>` loads fine.
 
 ---
 
 ## Data specification
 
-The dataset is stored at the top of the `<script>` block as a **`RAW` array**, where each car is a **fixed-order array** (not an object) for compactness. `CARS` maps these into named objects for the rest of the app.
+The dataset lives in [`cars.js`](cars.js) as **`window.RAW`** — an array where each car is a **fixed-order array** (not an object) for compactness. In `index.html`, `CARS` maps these into named objects for the rest of the app.
 
 | Index | Field | Type | Notes |
 |------:|-------|------|-------|

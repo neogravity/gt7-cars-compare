@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GT7 Gr.1–4 Compare</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#14161B;
+    --panel:#1B1E24;
+    --panel2:#20232A;
+    --line:#2C3038;
+    --text:#ECECE4;
+    --sub:#8B909B;
+    --sub2:#5D626C;
+    --g1:#B073F0; /* GR.1 prototype violet */
+    --g2:#FF9A3D; /* GR.2 silhouette amber */
+    --g3:#FF5252; /* GR.3 GT red */
+    --g4:#4EA6FF; /* GR.4 blue */
+    --accent:#D9FF3D;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Roboto Mono',monospace;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.label,.pill,button,.th-label{font-family:'Oswald',sans-serif;}
+  .wrap{max-width:1400px;margin:0 auto;padding:28px 24px 80px;}
+
+  /* header */
+  header{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:16px;border-bottom:2px solid var(--line);padding-bottom:18px;margin-bottom:20px;}
+  .title-block h1{font-size:28px;font-weight:700;letter-spacing:.5px;margin:0 0 4px;text-transform:uppercase;}
+  .title-block .sub{color:var(--sub);font-size:13px;letter-spacing:.3px;}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;}
+  .legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--sub);}
+  .swatch{width:10px;height:10px;border-radius:2px;display:inline-block;}
+
+  /* filter rail */
+  .filters{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:16px 18px;margin-bottom:18px;}
+  .filters-row{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;}
+  .field{display:flex;flex-direction:column;gap:6px;min-width:140px;}
+  .field label{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--sub2);font-weight:500;}
+  select,input[type=text]{
+    background:var(--panel2);border:1px solid var(--line);color:var(--text);
+    border-radius:4px;padding:8px 10px;font-family:'Roboto Mono',monospace;font-size:13px;
+  }
+  select:focus,input:focus{outline:1px solid var(--accent);}
+  .group-pills{display:flex;gap:6px;}
+  .pill{
+    border:1px solid var(--line);background:var(--panel2);color:var(--sub);
+    padding:8px 14px;border-radius:4px;font-size:13px;letter-spacing:.5px;cursor:pointer;
+    text-transform:uppercase;font-weight:500;user-select:none;transition:border-color .12s,color .12s;
+  }
+  .pill[data-active="1"]{color:#0d0f12;}
+  .pill[data-g="GR.1"][data-active="1"]{background:var(--g1);border-color:var(--g1);}
+  .pill[data-g="GR.2"][data-active="1"]{background:var(--g2);border-color:var(--g2);}
+  .pill[data-g="GR.3"][data-active="1"]{background:var(--g3);border-color:var(--g3);}
+  .pill[data-g="GR.4"][data-active="1"]{background:var(--g4);border-color:var(--g4);}
+  .range-field{min-width:190px;}
+  .range-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--sub2);margin-top:2px;}
+  input[type=range]{width:100%;accent-color:var(--accent);}
+  .reset-btn{
+    background:transparent;border:1px solid var(--sub2);color:var(--sub);
+    padding:8px 14px;border-radius:4px;font-size:12px;text-transform:uppercase;letter-spacing:1px;cursor:pointer;
+  }
+  .reset-btn:hover{border-color:var(--accent);color:var(--accent);}
+
+  /* columns dropdown */
+  .cols-menu{position:relative;}
+  .cols-btn{
+    background:transparent;border:1px solid var(--sub2);color:var(--sub);
+    padding:8px 14px;border-radius:4px;font-size:12px;text-transform:uppercase;letter-spacing:1px;cursor:pointer;
+    display:flex;align-items:center;gap:7px;
+  }
+  .cols-btn:hover{border-color:var(--accent);color:var(--accent);}
+  .cols-btn .caret{font-size:9px;opacity:.7;}
+  .cols-panel{
+    position:absolute;top:calc(100% + 6px);left:0;z-index:60;min-width:220px;
+    background:var(--panel2);border:1px solid var(--line);border-radius:6px;
+    padding:8px;box-shadow:0 8px 28px rgba(0,0,0,.45);display:none;
+  }
+  .cols-panel.show{display:block;}
+  .cols-panel .cols-title{
+    font-family:'Oswald',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:1px;
+    color:var(--sub2);padding:4px 8px 8px;display:flex;justify-content:space-between;align-items:center;
+  }
+  .cols-panel .cols-title button{
+    background:none;border:none;color:var(--sub);font-size:11px;cursor:pointer;text-transform:uppercase;letter-spacing:.5px;
+  }
+  .cols-panel .cols-title button:hover{color:var(--accent);}
+  .cols-opt{
+    display:flex;align-items:center;gap:9px;padding:6px 8px;border-radius:4px;
+    font-size:13px;color:var(--text);cursor:pointer;user-select:none;
+  }
+  .cols-opt:hover{background:var(--panel);}
+  .col-hidden{display:none !important;}
+  .count-line{color:var(--sub);font-size:12px;margin:0 0 10px;letter-spacing:.3px;}
+  .count-line b{color:var(--text);}
+
+  /* table */
+  .table-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:6px;}
+  table{width:100%;border-collapse:collapse;min-width:1500px;}
+  thead th{
+    position:sticky;top:0;background:var(--panel2);text-align:left;padding:11px 12px;
+    font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--sub);border-bottom:1px solid var(--line);
+    cursor:pointer;white-space:nowrap;user-select:none;
+  }
+  thead th.num{text-align:right;}
+  thead th:hover{color:var(--text);}
+  thead th .arrow{opacity:.5;margin-left:4px;font-size:10px;}
+  thead th.sorted{color:var(--accent);}
+  tbody td{padding:9px 12px;border-bottom:1px solid var(--line);font-size:13px;white-space:nowrap;}
+  tbody td.num{text-align:right;font-variant-numeric:tabular-nums;}
+  tbody tr:hover{background:var(--panel);}
+  tbody tr.checked{background:#22261f;}
+  .grp-tag{
+    display:inline-block;font-family:'Oswald',sans-serif;font-size:11px;font-weight:600;
+    padding:3px 8px;border-radius:3px;color:#0d0f12;letter-spacing:.5px;
+  }
+  .grp-tag.GR1{background:var(--g1);} .grp-tag.GR2{background:var(--g2);}
+  .grp-tag.GR3{background:var(--g3);} .grp-tag.GR4{background:var(--g4);}
+  .model-name{color:var(--text);font-weight:500;}
+  .manu-name{color:var(--sub);font-size:11.5px;display:block;}
+  td.chk{text-align:center;}
+  input[type=checkbox]{width:16px;height:16px;accent-color:var(--accent);cursor:pointer;}
+  .empty-row td{text-align:center;color:var(--sub2);padding:30px;}
+  .thumb{
+    width:64px;height:40px;object-fit:cover;border-radius:3px;background:var(--panel2);
+    border:1px solid var(--line);display:block;
+  }
+  .thumb-ph{
+    width:64px;height:40px;border-radius:3px;background:var(--panel2);border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;color:var(--sub2);font-size:9px;text-transform:uppercase;
+    letter-spacing:.5px;text-align:center;
+  }
+  .na{color:var(--sub2);}
+
+  /* view toggle */
+  .count-line-row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px;}
+  .count-line-row .count-line{margin:0;}
+  .view-toggle{display:flex;border:1px solid var(--line);border-radius:4px;overflow:hidden;flex-shrink:0;}
+  .view-toggle button{
+    background:var(--panel2);border:none;color:var(--sub);padding:7px 15px;
+    font-family:'Oswald',sans-serif;font-size:12px;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;
+    display:flex;align-items:center;gap:6px;
+  }
+  .view-toggle button + button{border-left:1px solid var(--line);}
+  .view-toggle button:hover{color:var(--text);}
+  .view-toggle button.active{background:var(--accent);color:#0d0f12;}
+
+  /* grid view */
+  .card-grid{display:none;grid-template-columns:repeat(8,1fr);gap:12px;}
+  .card-grid.show{display:grid;}
+  .car-card{
+    background:var(--panel);border:1px solid var(--line);border-radius:6px;overflow:hidden;
+    position:relative;display:flex;flex-direction:column;
+  }
+  .car-card.checked{border-color:var(--accent);background:#22261f;}
+  .card-img{position:relative;background:var(--panel2);}
+  .card-img img{width:100%;height:100%;aspect-ratio:1/1;object-fit:contain;display:block;}
+  .card-img .thumb-ph{width:100%;aspect-ratio:1/1;height:auto;border:none;border-radius:0;}
+  .card-body{padding:9px 10px 11px;display:flex;flex-direction:column;gap:7px;}
+  .card-top{display:flex;align-items:center;gap:8px;}
+  .card-chk{display:flex;align-items:center;}
+  .card-body .grp-tag{align-self:flex-start;}
+  .card-name .manu-name{font-size:10.5px;}
+  .card-name .model-name{font-size:12px;line-height:1.25;white-space:normal;display:block;}
+  .card-specs{display:flex;flex-direction:column;gap:0;margin:0;}
+  .card-specs > div{
+    display:flex;justify-content:space-between;align-items:baseline;gap:8px;
+    border-top:1px solid var(--line);padding:3px 0;
+  }
+  .card-specs dt{
+    color:var(--sub2);text-transform:uppercase;letter-spacing:.5px;font-size:9.5px;
+    font-family:'Oswald',sans-serif;flex-shrink:0;
+  }
+  .card-specs dd{margin:0;color:var(--text);text-align:right;font-size:11px;font-variant-numeric:tabular-nums;}
+  .card-specs dd .sub{display:block;color:var(--sub);font-size:9.5px;}
+  @media (max-width:1200px){ .card-grid{grid-template-columns:repeat(6,1fr);} }
+  @media (max-width:860px){ .card-grid{grid-template-columns:repeat(4,1fr);} }
+  @media (max-width:560px){ .card-grid{grid-template-columns:repeat(2,1fr);} }
+
+  /* compare tray */
+  .tray{
+    position:fixed;left:0;right:0;bottom:0;background:var(--panel2);border-top:1px solid var(--line);
+    padding:12px 24px;display:none;align-items:center;gap:14px;flex-wrap:wrap;z-index:50;
+    box-shadow:0 -6px 24px rgba(0,0,0,.4);
+  }
+  .tray.show{display:flex;}
+  .tray-label{font-family:'Oswald',sans-serif;font-size:12px;color:var(--sub);text-transform:uppercase;letter-spacing:1px;}
+  .chip{
+    display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--line);
+    border-radius:20px;padding:5px 6px 5px 12px;font-size:12px;
+  }
+  .chip button{background:none;border:none;color:var(--sub);cursor:pointer;font-size:14px;line-height:1;padding:2px 6px;}
+  .chip button:hover{color:var(--g3);}
+  .compare-btn{
+    margin-left:auto;background:var(--accent);color:#0d0f12;border:none;border-radius:4px;
+    padding:9px 18px;font-family:'Oswald',sans-serif;font-weight:600;text-transform:uppercase;
+    letter-spacing:.5px;font-size:13px;cursor:pointer;
+  }
+  .compare-btn:disabled{opacity:.4;cursor:not-allowed;}
+  .clear-btn{background:none;border:1px solid var(--sub2);color:var(--sub);border-radius:4px;padding:9px 14px;font-size:12px;cursor:pointer;text-transform:uppercase;letter-spacing:.5px;}
+
+  /* modal */
+  .modal-bg{
+    position:fixed;inset:0;background:rgba(10,11,13,.75);display:none;align-items:center;justify-content:center;
+    z-index:100;padding:24px;
+  }
+  .modal-bg.show{display:flex;}
+  .modal{
+    background:var(--panel);border:1px solid var(--line);border-radius:8px;max-width:1100px;width:100%;
+    max-height:85vh;overflow:auto;padding:22px 24px 26px;
+  }
+  .modal h2{margin:0 0 16px;font-size:20px;text-transform:uppercase;letter-spacing:.5px;}
+  .modal-close{float:right;background:none;border:none;color:var(--sub);font-size:22px;cursor:pointer;line-height:1;}
+  .cmp-table{width:100%;border-collapse:collapse;}
+  .cmp-table th,.cmp-table td{padding:8px 10px;border-bottom:1px solid var(--line);font-size:13px;text-align:left;white-space:nowrap;}
+  .cmp-table th{color:var(--sub);font-family:'Oswald',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.5px;position:sticky;left:0;background:var(--panel);}
+  .cmp-table td:first-child,.cmp-table th:first-child{position:sticky;left:0;background:var(--panel);}
+  .cmp-table td.num{font-variant-numeric:tabular-nums;}
+
+  footer{margin-top:30px;color:var(--sub2);font-size:11.5px;line-height:1.7;border-top:1px solid var(--line);padding-top:16px;}
+  footer a{color:var(--sub);}
+
+  @media (max-width:640px){
+    thead th, tbody td{padding:8px 8px;font-size:12px;}
+    .wrap{padding:18px 12px 90px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="title-block">
+      <h1>GT7 Compare — Gr.1 to Gr.4</h1>
+      <div class="sub">121 racing-class cars · in-game stats from GT ENGINE / DG EDGE</div>
+    </div>
+    <div class="legend">
+      <div class="legend-item"><span class="swatch" style="background:var(--g1)"></span>GR.1 Prototype</div>
+      <div class="legend-item"><span class="swatch" style="background:var(--g2)"></span>GR.2 Silhouette</div>
+      <div class="legend-item"><span class="swatch" style="background:var(--g3)"></span>GR.3 GT</div>
+      <div class="legend-item"><span class="swatch" style="background:var(--g4)"></span>GR.4 Sport</div>
+    </div>
+  </header>
+
+  <div class="filters">
+    <div class="filters-row">
+      <div class="field">
+        <label>Group</label>
+        <div class="group-pills" id="groupPills"></div>
+      </div>
+      <div class="field" style="min-width:200px;">
+        <label>Search model / manufacturer</label>
+        <input type="text" id="searchBox" placeholder="e.g. Ferrari, GT3, Supra…">
+      </div>
+      <div class="field">
+        <label>Manufacturer</label>
+        <select id="manuSelect"><option value="">All</option></select>
+      </div>
+      <div class="field">
+        <label>Drivetrain</label>
+        <select id="dtSelect">
+          <option value="">All</option>
+          <option value="FF">FF</option><option value="FR">FR</option>
+          <option value="MR">MR</option><option value="RR">RR</option><option value="4WD">4WD</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Aspiration</label>
+        <select id="aspSelect">
+          <option value="">All</option>
+          <option value="NA">NA</option><option value="TC">TC</option>
+          <option value="SC">SC</option><option value="EV">EV</option>
+        </select>
+      </div>
+      <div class="field range-field">
+        <label>PP up to <span id="ppVal"></span></label>
+        <input type="range" id="ppRange">
+        <div class="range-labels"><span id="ppMin"></span><span id="ppMax"></span></div>
+      </div>
+      <div class="field range-field">
+        <label>Power (HP) up to <span id="hpVal"></span></label>
+        <input type="range" id="hpRange">
+        <div class="range-labels"><span id="hpMin"></span><span id="hpMax"></span></div>
+      </div>
+      <button class="reset-btn" id="resetBtn">Reset filters</button>
+      <div class="cols-menu">
+        <button class="cols-btn" id="colsBtn">Columns <span class="caret">▼</span></button>
+        <div class="cols-panel" id="colsPanel">
+          <div class="cols-title"><span>Show columns</span><button id="colsAllBtn">Show all</button></div>
+          <div id="colsOpts"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="count-line-row">
+    <p class="count-line">Showing <b id="countShown">0</b> of <b id="countTotal">0</b> cars — click any column header to sort, check rows to compare.</p>
+    <div class="view-toggle" id="viewToggle">
+      <button data-view="list" class="active">▤ List</button>
+      <button data-view="grid">▦ Grid</button>
+    </div>
+  </div>
+
+  <div class="table-scroll" id="tableScroll">
+    <table>
+      <thead>
+        <tr>
+          <th class="chk"></th>
+          <th class="col-g" data-key="g">Group <span class="arrow"></span></th>
+          <th class="img-th col-img"></th>
+          <th class="col-m" data-key="m">Manufacturer / Model <span class="arrow"></span></th>
+          <th class="col-dt" data-key="dt">Drive <span class="arrow"></span></th>
+          <th class="col-asp" data-key="asp">Asp. <span class="arrow"></span></th>
+          <th class="num col-disp" data-key="disp">Displacement <span class="arrow"></span></th>
+          <th class="num col-hp" data-key="hp">Max Power <span class="arrow"></span></th>
+          <th class="num col-torque" data-key="torqueFtLb">Max Torque <span class="arrow"></span></th>
+          <th class="num col-wt" data-key="wt">Weight <span class="arrow"></span></th>
+          <th class="num col-len" data-key="lenMm">Length <span class="arrow"></span></th>
+          <th class="num col-wid" data-key="widMm">Width <span class="arrow"></span></th>
+          <th class="num col-hei" data-key="heiMm">Height <span class="arrow"></span></th>
+          <th class="num col-pp" data-key="pp">PP <span class="arrow"></span></th>
+          <th class="num col-pr" data-key="pr">Price <span class="arrow"></span></th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+
+  <div class="card-grid" id="grid"></div>
+
+  <footer>
+    All 121 cars fully specced directly from Sony/Polyphony's own <a href="https://www.gran-turismo.com/us/gt7/carlist/" target="_blank">gran-turismo.com Car List</a> data (displacement, drivetrain, max power with RPM, max torque with RPM, weight, aspiration, and dimensions) — pulled straight from the site's own data bundle, not a third-party mirror.<br>
+    Metric figures (kg, cm, Nm) are conversions from the site's native imperial units (lbs., in., ft-lb) shown alongside for reference.<br>
+    Thumbnails are the official GT7 car-list images (<code>car_thumbnails/car{id}.png</code>), with the site's larger detail image as a fallback if a thumbnail is missing. Click any row's manufacturer/model to see the price is from the in-game dealership (not listed on gran-turismo.com itself).
+  </footer>
+</div>
+
+<div class="tray" id="tray">
+  <span class="tray-label">Comparing</span>
+  <div id="chips" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
+  <button class="clear-btn" id="clearBtn">Clear</button>
+  <button class="compare-btn" id="compareBtn" disabled>Compare selected →</button>
+</div>
+
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <button class="modal-close" id="modalClose">&times;</button>
+    <h2>Side-by-side comparison</h2>
+    <div style="overflow-x:auto;">
+      <table class="cmp-table" id="cmpTable"></table>
+    </div>
+  </div>
+</div>
+
+<script>
+// Data format: [name, manufacturer, group, drivetrain, power(HP), weight(kg), aspiration, PP, price, dgEdgeUrl]
+const RAW = [
+// Fields: name, manufacturer, group, drivetrain, maxPower(HP), weight(kg), aspiration, PP, price,
+// displacement(cc or null), maxTorque(Nm), length(mm), width(mm), height(mm), officialCarId,
+// powerRpm, torqueRpm, weight(lb), length(in), width(in), height(in), maxTorque(ft-lb)
+["SRT Tomahawk VGT (Gr.1)","Dodge","GR.1","MR",693,949.8,"NA",889.97,1000000,null,595.75,5141.0,2242.8,972.8,"3188",9200,7500,2094,202.4,88.3,38.3,439.4],
+["908 HDi FAP '10","Peugeot","GR.1","MR",700,929.9,"TC",884.64,1000000,"5500",1200.71,4610.1,1999.0,1031.2,"1646",6000,3500,2050,181.5,78.7,40.6,885.6],
+["HYUNDAI N 2025 VGT (Gr.1)","Hyundai","GR.1","4WD",640,972.0,"NA",894.69,1000000,null,602.39,4678.7,2265.7,932.2,"2180",9000,7000,2143,184.2,89.2,36.7,444.3],
+["LM55 VGT (Gr.1)","Mazda","GR.1","4WD",641,880.0,"NA",884.74,1000000,null,564.83,4749.8,2034.5,861.1,"2181",8500,6500,1940,187,80.1,33.9,416.6],
+["TS030 Hybrid '12","Toyota","GR.1","MR",529,899.9,"NA",886.77,1000000,"3400",415.29,4650.7,1999.0,1150.6,"2101",10000,6000,1984,183.1,78.7,45.3,306.3],
+["L750R HYbrid VGT 2017","Peugeot","GR.1","4WD",693,825.1,"TC",882.96,1000000,null,877.89,5044.4,1999.0,1054.1,"3333",6000,2500,1819,198.6,78.7,41.5,647.5],
+["GT-R LM NISMO '15","Nissan","GR.1","4WD",604,880.0,"TC",895.62,1000000,"3000",937.14,4650.7,1894.8,1049.0,"2127",5400,4500,1940,183.1,74.6,41.3,691.2],
+["Bugatti VGT (Gr.1)","Bugatti","GR.1","4WD",641,980.2,"TC",913.94,1000000,null,722.92,4752.3,2123.4,1132.8,"2179",6500,3500,2161,187.1,83.6,44.6,533.2],
+["McLaren VGT (Gr.1)","McLaren","GR.1","MR",813,899.9,"TC",881.32,1000000,"3998",662.05,4287.5,1950.7,988.1,"3335",8000,5000,1984,168.8,76.8,38.9,488.3],
+["919 Hybrid '16","Porsche","GR.1","4WD",499,875.0,"TC",879.53,3000000,"2000",518.47,4650.7,1988.8,1150.6,"3313",7500,4000,1929,183.1,78.3,45.3,382.4],
+["Audi VGT","Audi","GR.1","4WD",735,1250.1,"TC",871.86,1000000,"3400",700.15,4704.1,2126.0,1107.4,"3314",7500,5000,2756,185.2,83.7,43.6,516.4],
+["TS050 - Hybrid '16","Toyota","GR.1","4WD",493,875.0,"TC",878.7,1000000,"2400",504.09,4650.7,1899.9,1150.6,"3312",7500,4000,1929,183.1,74.8,45.3,371.8],
+["963 '24","Porsche","GR.1","MR",670,1030.1,"TC",856.73,3000000,null,672.22,5100.3,1999.0,1059.2,"3607",8200,6200,2271,200.8,78.7,41.7,495.8],
+["R18 '16","Audi","GR.1","4WD",506,875.0,"TC",874.86,1000000,"4000",852.0,4650.7,1899.9,1049.0,"3334",4600,3000,1929,183.1,74.8,41.3,628.4],
+["R18 TDI '11","Audi","GR.1","MR",532,899.9,"TC",872.12,3000000,"3700",900.54,4650.7,1999.0,1099.8,"1965",4800,3500,1984,183.1,78.7,43.3,664.2],
+["XJR-9 '88","Jaguar","GR.1","MR",749,894.0,"NA",837.15,2200000,"6995",780.68,4800.6,1999.0,1031.2,"1067",7200,5500,1971,189,78.7,40.6,575.8],
+["GR010 HYBRID '21","Toyota","GR.1","4WD",670,1040.1,"TC",851.57,3000000,"3500",671.4,4899.7,1999.0,1150.6,"3499",7800,6600,2293,192.9,78.7,45.3,495.2],
+["499P '23","Ferrari","GR.1","4WD",670,1030.1,"TC",851.27,3000000,"2992",790.17,5100.3,1999.0,1054.1,"3605",7400,5500,2271,200.8,78.7,41.5,582.8],
+["Alpine VGT '17","Alpine","GR.1","RR",594,929.9,"NA",852.96,1000000,"4200",554.94,5283.2,2100.6,939.8,"3187",8000,5000,2050,208,82.7,37,409.3],
+["9X8 '25","Peugeot","GR.1","4WD",670,1030.1,"TC",840.41,3000000,null,672.89,4996.2,1999.0,1145.5,"3606",8200,6600,2271,196.7,78.7,45.1,496.3],
+["M Hybrid V8 '25","BMW","GR.1","MR",641,1030.1,"TC",845.08,3000000,"3999",616.76,4991.1,1993.9,1198.9,"3604",7800,6600,2271,196.5,78.5,47.2,454.9],
+["Sauber Mercedes C9 '89","Mercedes-Benz","GR.1","MR",710,893.1,"TC",831.54,3000000,"4973",809.97,4699.0,1981.2,1049.0,"998",7000,3500,1969,185,78,41.3,597.4],
+["R92CP '92","Nissan","GR.1","MR",788,899.9,"TC",856.17,3000000,"3496",784.48,4800.6,1988.8,1099.8,"954",7600,5500,1984,189,78.3,43.3,578.6],
+["962 C '88","Porsche","GR.1","MR",690,850.0,"TC",814.85,1500000,"2649",709.91,4770.1,1988.8,1079.5,"3373",8000,5000,1874,187.8,78.3,42.5,523.6],
+["787B '91","Mazda","GR.1","MR",690,830.1,"NA",819.07,2200000,"654x4",607.95,4782.8,1993.9,1003.3,"296",9100,6500,1830,188.3,78.5,39.5,448.4],
+["NSX CONCEPT-GT '16","Honda","GR.2","MR",603,1049.2,"TC",861.0,800000,"1995",612.83,4676.1,1950.7,1209.0,"3348",8500,5000,2313,184.1,76.8,47.6,452.0],
+["GT-R NISMO GT500 '16","Nissan","GR.2","FR",612,1020.1,"TC",860.59,800000,"1998",588.43,4775.2,1950.7,1191.3,"3350",8100,4500,2249,188,76.8,46.9,434.0],
+["RC F GT500 '16","Lexus","GR.2","FR",614,1020.1,"TC",861.42,800000,"2000",588.83,5100.3,1950.7,1226.8,"3349",8000,4000,2249,200.8,76.8,48.3,434.3],
+["RS 5 Turbo DTM '19","Audi","GR.2","FR",603,986.1,"TC",854.49,1000000,"2000",650.39,4958.1,1950.7,1150.6,"3523",9000,4000,2174,195.2,76.8,45.3,479.7],
+["GT-One (TS020) '99","Toyota","GR.2","MR",764,899.9,"TC",845.05,2500000,"3600",820.68,4841.2,1999.0,1125.2,"116",7500,6000,1984,190.6,78.7,44.3,605.3],
+["GT-R GT500 '08","Nissan","GR.2","FR",527,1100.0,"NA",801.73,1000000,"4494",550.73,4800.6,1999.0,1099.8,"1466",7000,4500,2425,189,78.7,43.3,406.2],
+["NSX GT500 '08","Honda","GR.2","MR",518,1149.9,"NA",796.27,800000,"3494",588.97,4610.1,1999.0,1099.8,"1510",7500,5500,2535,181.5,78.7,43.3,434.4],
+["SC430 GT500 '08","Lexus","GR.2","FR",516,1100.0,"NA",796.49,800000,"4480",585.17,4699.0,1925.3,1198.9,"1516",7000,5500,2425,185,75.8,47.2,431.6],
+["CLK-LM '98","Mercedes-Benz","GR.2","MR",599,939.8,"NA",798.92,6500000,null,539.35,4899.7,1999.0,1127.8,"3397",8500,7000,2072,192.9,78.7,44.4,397.8],
+["McLaren F1 GTR Race Car '97","BMW","GR.2","MR",602,949.8,"NA",776.46,10000000,null,711.4,4925.1,1920.2,1120.1,"216",6500,5000,2094,193.9,75.6,44.1,524.7],
+["Mercedes-AMG GT3 '20","AMG","GR.3","FR",614,1285.0,"NA",731.13,480000,"6208",720.08,4747.3,2049.8,1237.0,"3531",6700,4500,2833,186.9,80.7,48.7,531.1],
+["296 GT3 '23","Ferrari","GR.3","MR",599,1280.0,"TC",734.11,1200000,"2992",712.89,4564.4,2049.8,1191.3,"3588",6800,5500,2822,179.7,80.7,46.9,525.8],
+["Viper SRT GT3-R '15","Dodge","GR.3","FR",678,1290.0,"NA",731.4,450000,"8383",868.81,4539.0,2067.6,1160.8,"3223",6000,5000,2844,178.7,81.4,45.7,640.8],
+["Beetle Gr.3","Volkswagen","GR.3","FR",591,1200.2,"TC",736.96,450000,null,592.49,4368.8,1958.3,1346.2,"3305",8400,6500,2646,172,77.1,53,437.0],
+["M6 GT3 Sprint Model '16","BMW","GR.3","FR",584,1300.0,"TC",731.77,450000,null,750.18,4942.8,2047.2,1277.6,"3221",6100,3500,2866,194.6,80.6,50.3,553.3],
+["M6 GT3 Endurance Model '16","BMW","GR.3","FR",584,1300.0,"TC",731.77,450000,null,750.18,4942.8,2047.2,1277.6,"3218",6100,3500,2866,194.6,80.6,50.3,553.3],
+["GR Supra Racing Concept '18","Toyota","GR.3","FR",591,1242.8,"TC",730.6,450000,null,698.11,4574.5,2047.2,1229.4,"3352",6800,6000,2740,180.1,80.6,48.4,514.9],
+["GT by Citroën Race Car (Gr.3)","Citroën","GR.3","MR",599,1200.2,"NA",720.99,450000,null,584.36,5207.0,2120.9,1115.1,"2190",8500,6500,2646,205,83.5,43.9,431.0],
+["McLaren F1 GTR - BMW '95","McLaren","GR.3","MR",600,1050.1,"NA",724.19,15000000,"6064",651.34,4292.6,1821.2,1140.5,"1984",7500,6000,2315,169,71.7,44.9,480.4],
+["R8 LMS Evo '19","Audi","GR.3","MR",576,1235.1,"NA",724.25,450000,"5200",574.6,4572.0,1996.4,1170.9,"3405",7500,6500,2723,180,78.6,46.1,423.8],
+["RX-VISION GT3 CONCEPT","Mazda","GR.3","FR",562,1250.1,"NA",723.33,450000,null,539.35,4589.8,2075.2,1120.1,"3419",8900,6500,2756,180.7,81.7,44.1,397.8],
+["RX-VISION GT3 CONCEPT Stealth Model","Mazda","GR.3","FR",562,1250.1,"NA",723.33,450000,null,539.35,4589.8,2075.2,1120.1,"3419",8900,6500,2756,180.7,81.7,44.1,397.8],
+["R8 LMS '15","Audi","GR.3","MR",585,1225.2,"NA",723.85,800000,"5200",574.6,4582.2,1996.4,1170.9,"2143",7500,6500,2701,180.4,78.6,46.1,423.8],
+["Mercedes-AMG GT3 '16","AMG","GR.3","FR",614,1324.9,"NA",723.82,450000,"6208",720.08,4569.5,2049.8,1249.7,"3224",6700,4500,2921,179.9,80.7,49.2,531.1],
+["Huracán GT3 '15","Lamborghini","GR.3","MR",576,1230.1,"NA",720.18,450000,"5204",580.43,4457.7,2049.8,1130.3,"2177",8000,6500,2712,175.5,80.7,44.5,428.1],
+["Ford GT LM Race Car Spec II","Ford","GR.3","MR",606,1129.9,"SC",712.26,1600000,"5400",713.84,4612.6,1950.7,1104.9,"1040",6500,4000,2491,181.6,76.8,43.5,526.5],
+["911 GT3 R (992) '22","Porsche","GR.3","RR",557,1250.1,"NA",731.91,900000,"4194",500.7,4620.3,2049.8,1290.3,"3600",9000,7500,2756,181.9,80.7,50.8,369.3],
+["458 Italia GT3 '13","Ferrari","GR.3","MR",542,1215.2,"NA",728.41,450000,"4497",550.06,4599.9,2034.5,1158.2,"2158",9000,6000,2679,181.1,80.1,45.6,405.7],
+["GT-R NISMO GT3 '18","Nissan","GR.3","FR",576,1285.0,"TC",720.8,600000,"3799",661.91,4831.1,2037.1,1348.7,"3450",6500,3500,2833,190.2,80.2,53.1,488.2],
+["BRZ GT300 '21","Subaru","GR.3","FR",478,1149.9,"TC",714.48,450000,"1994",664.76,4564.4,1950.7,1160.8,"3474",6700,4500,2535,179.7,76.8,45.7,490.3],
+["Lancer Evolution Final Gr.3","Mitsubishi","GR.3","FR",610,1290.0,"TC",721.8,450000,null,653.37,4711.7,2044.7,1336.0,"2185",7000,5000,2844,185.5,80.5,52.6,481.9],
+["Ford GT LM Spec II Test Car","Ford","GR.3","MR",590,1164.8,"SC",708.27,1200000,"5409",723.6,4643.1,1953.3,1125.2,"1425",6500,4000,2568,182.8,76.9,44.3,533.7],
+["WRX Gr.3","Subaru","GR.3","FR",591,1280.0,"TC",718.27,450000,null,619.47,5064.8,2039.6,1318.3,"2186",7500,4500,2822,199.4,80.3,51.9,456.9],
+["F-type Gr.3","Jaguar","GR.3","FR",552,1250.1,"SC",716.65,450000,null,679.54,4673.6,1988.8,1216.7,"2184",6500,3500,2756,184,78.3,47.9,501.2],
+["Genesis X GR3","Genesis","GR.3","FR",547,1280.0,"TC",715.37,450000,"3342",697.03,4925.1,1991.4,1331.0,"3502",6500,3000,2822,193.9,78.4,52.4,514.1],
+["RC F GT3 '17","Lexus","GR.3","FR",535,1300.0,"NA",715.47,450000,"5407",615.81,4846.3,2029.5,1310.6,"3340",7000,4500,2866,190.8,79.9,51.6,454.2],
+["650S GT3 '15","McLaren","GR.3","MR",542,1240.1,"TC",705.64,450000,"3799",559.82,4533.9,2039.6,1198.9,"2182",7500,4500,2734,178.5,80.3,47.2,412.9],
+["Genesis Gr.3","Hyundai","GR.3","FR",575,1250.1,"NA",717.49,450000,null,542.46,4945.4,2016.8,1282.7,"2160",8000,6500,2756,194.7,79.4,50.5,400.1],
+["Ford GT Race Car '18","Ford","GR.3","MR",527,1200.2,"TC",705.15,1000000,"3500",611.88,4762.5,2044.7,1031.2,"3436",6500,4000,2646,187.5,80.5,40.6,451.3],
+["Atenza Gr.3","Mazda","GR.3","FR",567,1280.0,"TC",709.04,450000,null,569.04,5080.0,2049.8,1379.2,"3237",8000,5500,2822,200,80.7,54.3,419.7],
+["R.S.01 GT3 '16","Renault","GR.3","MR",534,1220.2,"TC",709.78,450000,"3799",626.52,4704.1,1999.0,1229.4,"2188",6700,5000,2690,185.2,78.7,48.4,462.1],
+["SLS AMG GT3 '11","AMG","GR.3","FR",614,1349.9,"NA",702.44,450000,null,720.08,4709.2,1988.8,1193.8,"1797",6700,4500,2976,185.4,78.3,47,531.1],
+["911 RSR (991) '17","Porsche","GR.3","MR",509,1242.8,"NA",720.94,450000,"4000",488.77,4556.8,2047.2,1290.3,"3311",8100,6000,2740,179.4,80.6,50.8,360.5],
+["DBR9 GT1 '10","Aston Martin","GR.3","FR",599,1100.0,"NA",711.2,800000,"5935",665.44,4686.3,1978.7,1193.8,"3394",6500,5500,2425,184.5,77.9,47,490.8],
+["RC F GT3 prototype '16","Lexus","GR.3","FR",527,1300.0,"NA",708.82,450000,"5327",607.95,4899.7,2039.6,1310.6,"3228",7000,5000,2866,192.9,80.3,51.6,448.4],
+["FT-1 VGT (Gr.3)","Toyota","GR.3","FR",544,1280.0,"TC",710.23,450000,null,470.33,5029.2,2080.3,1181.1,"2187",9300,5800,2822,198,81.9,46.5,346.9],
+["NSX Gr.3","Honda","GR.3","MR",568,1300.0,"TC",702.47,450000,null,584.36,4612.6,2037.1,1168.4,"3235",7500,3000,2866,181.6,80.2,46,431.0],
+["Corvette C7 Gr.3","Chevrolet","GR.3","FR",571,1300.0,"NA",706.82,450000,null,714.79,4777.7,2049.8,1160.8,"2183",6000,3500,2866,188.1,80.7,45.7,527.2],
+["Mustang Gr.3","Ford","GR.3","FR",568,1300.0,"NA",706.15,450000,null,600.09,4922.5,1999.0,1280.2,"2159",7000,6000,2866,193.8,78.7,50.4,442.6],
+["V12 Vantage GT3 '12","Aston Martin","GR.3","FR",591,1250.1,"NA",706.48,450000,"5935",686.99,4760.0,1978.7,1341.1,"2131",6500,5500,2756,187.4,77.9,52.8,506.7],
+["PEUGEOT VGT (Gr.3)","Peugeot","GR.3","MR",542,1250.1,"TC",693.22,450000,"3200",554.94,4787.9,2204.7,967.7,"3183",7800,6500,2756,188.5,86.8,38.1,409.3],
+["4C Gr.3","Alfa Romeo","GR.3","MR",528,1220.2,"TC",711.97,450000,null,529.18,4340.9,1950.7,1181.1,"3185",8000,5500,2690,170.9,76.8,46.5,390.3],
+["Z4 GT3 '11","BMW","GR.3","FR",522,1189.8,"NA",705.97,450000,"4361",515.21,4386.6,2011.7,1209.0,"1902",8000,5500,2623,172.7,79.2,47.6,380.0],
+["GT-R NISMO GT3 '13","Nissan","GR.3","FR",591,1300.0,"TC",699.11,450000,"3799",686.45,4780.3,2037.1,1348.7,"1905",6500,3500,2866,188.2,80.2,53.1,506.3],
+["RCZ Gr.3","Peugeot","GR.3","MR",520,1200.2,"TC",692.31,450000,null,550.06,4749.8,2052.3,1323.3,"3238",7500,3500,2646,187,80.8,52.1,405.7],
+["SUZUKI VGT (Gr.3)","Suzuki","GR.3","FR",577,1220.2,"TC",711.41,450000,"2680",490.26,4201.2,1839.0,1145.5,"3508",10000,7500,2690,165.4,72.4,45.1,361.6],
+["Supra GT500 '97","Toyota","GR.3","FR",492,1149.9,"TC",696.44,1800000,"1998",643.2,4521.2,1910.1,1198.9,"1470",6900,4500,2535,178,75.2,47.2,474.4],
+["NSX GT500 '00","Honda","GR.3","MR",481,1149.9,"NA",696.07,1500000,"3500",454.61,4429.8,1910.1,1089.7,"140",8000,7000,2535,174.4,75.2,42.9,335.3],
+["GT-R GT500 '99","Nissan","GR.3","FR",498,1200.2,"TC",695.5,2700000,"2708",705.98,4599.9,1884.7,1219.2,"485",5800,4500,2646,181.1,74.2,48,520.7],
+["M3 GT '11","BMW","GR.3","FR",500,1245.1,"NA",693.16,600000,"4000",500.3,4714.2,1917.7,1287.8,"1904",8400,5500,2745,185.6,75.5,50.7,369.0],
+["Skyline Super Silhouette '84","Nissan","GR.3","FR",561,1005.2,"TC",687.5,1150000,"2083",539.35,5064.8,1981.2,1239.5,"3493",7500,6500,2216,199.4,78,48.8,397.8],
+["GTI VGT (Gr.3)","Volkswagen","GR.3","MR",551,1260.1,"TC",690.41,450000,null,665.44,4379.0,1930.4,1059.2,"2192",6500,4500,2778,172.4,76,41.7,490.8],
+["155 2.5 V6 TI '93","Alfa Romeo","GR.4","4WD",413,1010.2,"NA",665.04,800000,"2498",294.08,4577.1,1750.1,1379.2,"365",11500,7500,2227,180.2,68.9,54.3,216.9],
+["Huracán Gr.4","Lamborghini","GR.4","4WD",404,1364.9,"NA",647.81,350000,"5204",377.05,4549.1,1943.1,1145.5,"3253",8300,6500,3009,179.1,76.5,45.1,278.1],
+["Mégane Trophy '11","Renault","GR.4","MR",359,954.8,"NA",650.24,350000,"3498",390.07,4373.9,1910.1,1239.5,"1563",7500,5000,2105,172.2,75.2,48.8,287.7],
+["GT by Citroën Gr.4","Citroën","GR.4","MR",394,1300.0,"NA",642.03,350000,null,384.51,4958.1,2250.4,1211.6,"3248",8500,6500,2866,195.2,88.6,47.7,283.6],
+["Swift Sport Gr.4","Suzuki","GR.4","FF",345,899.9,"TC",665.11,350000,null,441.18,3990.3,1821.2,1470.7,"3480",6500,4500,1984,157.1,71.7,57.9,325.4],
+["Scirocco Gr.4","Volkswagen","GR.4","FF",358,1050.1,"TC",656.7,350000,"1984",396.17,4300.2,1805.9,1369.1,"3231",7000,4000,2315,169.3,71.1,53.9,292.2],
+["Corvette C7 Gr.4","Chevrolet","GR.4","FR",414,1349.9,"NA",639.58,350000,null,568.77,4574.5,1872.0,1191.3,"3247",6000,4500,2976,180.1,73.7,46.9,419.5],
+["Viper Gr.4","Dodge","GR.4","FR",428,1399.8,"NA",642.19,350000,null,546.4,4622.8,1932.9,1214.1,"3249",6400,5000,3086,182,76.1,47.8,403.0],
+["NSX Gr.4","Honda","GR.4","MR",394,1359.9,"TC",635.09,350000,"3493",434.13,4645.7,2220.0,1104.9,"3251",6700,3800,2998,182.9,87.4,43.5,320.2],
+["Cayman GT4 Clubsport '16","Porsche","GR.4","MR",379,1300.0,"NA",643.76,350000,"3800",420.58,4437.4,2001.5,1264.9,"3310",7500,5000,2866,174.7,78.8,49.8,310.2],
+["GT-R Gr.4","Nissan","GR.4","4WD",428,1450.1,"TC",633.75,350000,null,500.03,4780.3,1894.8,1341.1,"2161",6500,3800,3197,188.2,74.6,52.8,368.8],
+["Mégane Gr.4","Renault","GR.4","FF",350,1100.0,"TC",644.16,350000,"1998",452.17,4300.2,1849.1,1391.9,"3260",6500,4000,2425,169.3,72.8,54.8,333.5],
+["GR Supra Race Car '19","Toyota","GR.4","FR",394,1379.8,"TC",637.33,350000,null,587.88,4379.0,1864.4,1295.4,"3399",5800,2500,3042,172.4,73.4,51,433.6],
+["G70 GR4","Genesis","GR.4","4WD",414,1399.8,"TC",639.85,350000,"3342",527.41,4729.5,1882.1,1381.8,"3501",6400,2500,3086,186.2,74.1,54.4,389.0],
+["Silvia spec-R Aero (S15) Touring Car","Nissan","GR.4","FR",355,1000.2,"TC",636.89,350000,"1998",351.43,4445.0,1694.2,1285.2,"3477",7200,7200,2205,175,66.7,50.6,259.2],
+["SLS AMG Gr.4","AMG","GR.4","FR",419,1415.2,"NA",634.5,350000,null,478.06,4638.0,1938.0,1262.4,"3192",7000,5000,3120,182.6,76.3,49.7,352.6],
+["V8 Vantage Gr.4","Aston Martin","GR.4","FR",399,1349.9,"NA",630.97,350000,null,490.26,4460.2,1897.4,1242.1,"2157",7000,5000,2976,175.6,74.7,48.9,361.6],
+["458 Italia Gr.4","Ferrari","GR.4","MR",374,1349.9,"NA",619.26,350000,"4499",359.83,4554.2,1938.0,1158.2,"3263",9000,6000,2976,179.3,76.3,45.6,265.4],
+["MAZDA3 Gr.4","Mazda","GR.4","FF",380,1200.2,"TC",644.19,350000,null,433.32,4470.4,1955.8,1379.2,"3537",7000,4000,2646,176,77,54.3,319.6],
+["F-type Gr.4","Jaguar","GR.4","FR",399,1349.9,"SC",629.54,350000,"4999",501.38,4610.1,1925.3,1259.8,"3252",6500,3500,2976,181.5,75.8,49.6,369.8],
+["86 Gr.4","Toyota","GR.4","FR",358,1200.2,"NA",638.52,350000,"1998",370.95,4277.4,1783.1,1234.4,"3262",7000,6500,2646,168.4,70.2,48.6,273.6],
+["650S Gr.4","McLaren","GR.4","MR",399,1300.0,"TC",615.79,350000,"3799",423.42,4574.5,1907.5,1160.8,"3257",7500,6000,2866,180.1,75.1,45.7,312.3],
+["Mustang Gr.4","Ford","GR.4","FR",395,1399.8,"NA",625.85,350000,null,501.92,4833.6,1915.2,1320.8,"2164",6500,4500,3086,190.3,75.4,52,370.2],
+["RC F Gr.4","Lexus","GR.4","FR",419,1399.8,"NA",636.06,350000,"4968",472.37,4760.0,1849.1,1348.7,"3254",7000,5000,3086,187.4,72.8,53.1,348.4],
+["4C Gr.4","Alfa Romeo","GR.4","MR",295,1020.1,"TC",624.51,350000,null,356.45,3990.3,1869.4,1158.2,"2166",7000,4500,2249,157.1,73.6,45.6,262.9],
+["Genesis Gr.4","Hyundai","GR.4","FR",384,1349.9,"NA",620.31,350000,null,411.63,4734.6,1864.4,1343.7,"2163",7000,5500,2976,186.4,73.4,52.9,303.6],
+["WRX Gr.4","Subaru","GR.4","4WD",377,1320.0,"TC",636.23,350000,"1994",480.77,4594.9,1795.8,1427.5,"3261",7000,3500,2910,180.9,70.7,56.2,354.6],
+["TT Cup '16","Audi","GR.4","FF",335,1124.9,"TC",642.31,350000,"1984",399.97,4259.6,1993.9,1282.7,"3298",6500,1500,2480,167.7,78.5,50.5,295.0],
+["Lancer Evolution Final Gr.4","Mitsubishi","GR.4","4WD",389,1329.9,"TC",630.38,350000,"1998",462.88,4559.3,1811.0,1427.5,"3258",7000,4000,2932,179.5,71.3,56.2,341.4],
+["M4 Gr.4","BMW","GR.4","FR",394,1364.9,"TC",625.74,350000,"2979",510.6,4777.7,1869.4,1353.8,"3245",5700,2000,3009,188.1,73.6,53.3,376.6],
+["Veyron Gr.4","Bugatti","GR.4","4WD",433,1650.2,"TC",623.61,350000,"7993",549.92,4495.8,1999.0,1168.4,"3246",6000,2500,3638,177,78.7,46,405.6],
+["RCZ Gr.4","Peugeot","GR.4","FF",345,1225.2,"TC",631.02,350000,"1598",392.65,4302.8,1866.9,1333.5,"3259",7000,3000,2701,169.4,73.5,52.5,289.6],
+["Atenza Gr.4","Mazda","GR.4","4WD",393,1379.8,"TC",613.56,350000,"2188",429.12,4991.1,1839.0,1369.1,"3256",7000,4500,3042,196.5,72.4,53.9,316.5],
+["ELANTRA N TC '24","Hyundai","GR.4","FF",350,1265.1,"TC",642.96,280000,"1998",450.27,4709.2,1950.7,1414.8,"3590",7000,3500,2789,185.4,76.8,55.7,332.1]
+];
+
+const CARS = RAW.map((r,i)=>({
+  id:i, name:r[0], manu:r[1], grp:r[2], dt:r[3], hp:r[4], wt:r[5], asp:r[6], pp:r[7], price:r[8],
+  disp:r[9]??null, torqueNm:r[10], lenMm:r[11], widMm:r[12], heiMm:r[13], carId:r[14],
+  powerRpm:r[15], torqueRpm:r[16], wtLb:r[17], lenIn:r[18], widIn:r[19], heiIn:r[20], torqueFtLb:r[21],
+  url:"https://www.gran-turismo.com/us/gt7/carlist/id/car"+r[14]
+}));
+
+function mmToCm(mm){ return mm==null ? null : (mm/10); }
+function imgUrl(c){
+  return `https://www.gran-turismo.com/common/dist/gt7/carlist/car_thumbnails/car${c.carId}.png`;
+}
+function imgFallbackUrl(c){
+  return `https://www.gran-turismo.com/common/dist/gt7/carlist/og_images/car${c.carId}_1_01.jpg`;
+}
+
+// toggleable columns (checkbox column is always shown)
+const COLUMNS = [
+  {id:'g',      label:'Group'},
+  {id:'img',    label:'Image'},
+  {id:'m',      label:'Manufacturer / Model'},
+  {id:'dt',     label:'Drive'},
+  {id:'asp',    label:'Aspiration'},
+  {id:'disp',   label:'Displacement'},
+  {id:'hp',     label:'Max Power'},
+  {id:'torque', label:'Max Torque'},
+  {id:'wt',     label:'Weight'},
+  {id:'len',    label:'Length'},
+  {id:'wid',    label:'Width'},
+  {id:'hei',    label:'Height'},
+  {id:'pp',     label:'PP'},
+  {id:'pr',     label:'Price'},
+];
+const COLS_LS_KEY = 'gt7-hidden-cols';
+function loadHiddenCols(){
+  try{
+    const raw = localStorage.getItem(COLS_LS_KEY);
+    if(!raw) return new Set();
+    return new Set(JSON.parse(raw).filter(id=>COLUMNS.some(c=>c.id===id)));
+  }catch(e){ return new Set(); }
+}
+function saveHiddenCols(){
+  try{ localStorage.setItem(COLS_LS_KEY, JSON.stringify([...state.hiddenCols])); }catch(e){}
+}
+
+const state = {
+  groups: new Set(["GR.1","GR.2","GR.3","GR.4"]),
+  search: "", manu: "", dt: "", asp: "",
+  ppMax: 0, hpMax: 0,
+  sortKey: "pp", sortDir: -1,
+  checked: new Set(),
+  hiddenCols: loadHiddenCols(),
+  view: (function(){ try{ return localStorage.getItem('gt7-view')==='grid' ? 'grid' : 'list'; }catch(e){ return 'list'; } })()
+};
+
+const ppAll = CARS.map(c=>c.pp), hpAll = CARS.map(c=>c.hp);
+const PP_MIN = Math.floor(Math.min(...ppAll)), PP_MAX = Math.ceil(Math.max(...ppAll));
+const HP_MIN = Math.floor(Math.min(...hpAll)), HP_MAX = Math.ceil(Math.max(...hpAll));
+state.ppMax = PP_MAX; state.hpMax = HP_MAX;
+
+// build group pills
+const pillsEl = document.getElementById('groupPills');
+["GR.1","GR.2","GR.3","GR.4"].forEach(g=>{
+  const p = document.createElement('div');
+  p.className = 'pill'; p.dataset.g = g; p.dataset.active = "1"; p.textContent = g;
+  p.addEventListener('click', ()=>{
+    if(state.groups.has(g)){ state.groups.delete(g); p.dataset.active="0"; }
+    else { state.groups.add(g); p.dataset.active="1"; }
+    render();
+  });
+  pillsEl.appendChild(p);
+});
+
+// manufacturer dropdown
+const manuSelect = document.getElementById('manuSelect');
+[...new Set(CARS.map(c=>c.manu))].sort().forEach(m=>{
+  const o = document.createElement('option'); o.value=m; o.textContent=m; manuSelect.appendChild(o);
+});
+
+// range inputs
+const ppRange = document.getElementById('ppRange');
+ppRange.min=PP_MIN; ppRange.max=PP_MAX; ppRange.value=PP_MAX;
+document.getElementById('ppMin').textContent=PP_MIN; document.getElementById('ppMax').textContent=PP_MAX;
+document.getElementById('ppVal').textContent=PP_MAX;
+
+const hpRange = document.getElementById('hpRange');
+hpRange.min=HP_MIN; hpRange.max=HP_MAX; hpRange.value=HP_MAX;
+document.getElementById('hpMin').textContent=HP_MIN; document.getElementById('hpMax').textContent=HP_MAX;
+document.getElementById('hpVal').textContent=HP_MAX;
+
+ppRange.addEventListener('input', ()=>{ state.ppMax = +ppRange.value; document.getElementById('ppVal').textContent = state.ppMax; render(); });
+hpRange.addEventListener('input', ()=>{ state.hpMax = +hpRange.value; document.getElementById('hpVal').textContent = state.hpMax; render(); });
+
+document.getElementById('searchBox').addEventListener('input', e=>{ state.search = e.target.value.toLowerCase(); render(); });
+manuSelect.addEventListener('change', e=>{ state.manu = e.target.value; render(); });
+document.getElementById('dtSelect').addEventListener('change', e=>{ state.dt = e.target.value; render(); });
+document.getElementById('aspSelect').addEventListener('change', e=>{ state.asp = e.target.value; render(); });
+
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  state.groups = new Set(["GR.1","GR.2","GR.3","GR.4"]);
+  state.search=""; state.manu=""; state.dt=""; state.asp="";
+  state.ppMax=PP_MAX; state.hpMax=HP_MAX;
+  document.getElementById('searchBox').value="";
+  manuSelect.value=""; document.getElementById('dtSelect').value=""; document.getElementById('aspSelect').value="";
+  ppRange.value=PP_MAX; document.getElementById('ppVal').textContent=PP_MAX;
+  hpRange.value=HP_MAX; document.getElementById('hpVal').textContent=HP_MAX;
+  document.querySelectorAll('.pill').forEach(p=>p.dataset.active="1");
+  render();
+});
+
+// sorting
+document.querySelectorAll('thead th[data-key]').forEach(th=>{
+  th.addEventListener('click', ()=>{
+    const key = th.dataset.key;
+    if(state.sortKey === key){ state.sortDir *= -1; }
+    else { state.sortKey = key; state.sortDir = 1; }
+    render();
+  });
+});
+
+// column show/hide
+function applyColVisibility(){
+  COLUMNS.forEach(col=>{
+    const hidden = state.hiddenCols.has(col.id);
+    document.querySelectorAll('.col-'+col.id).forEach(el=>el.classList.toggle('col-hidden', hidden));
+  });
+}
+
+const colsBtn = document.getElementById('colsBtn');
+const colsPanel = document.getElementById('colsPanel');
+const colsOpts = document.getElementById('colsOpts');
+
+COLUMNS.forEach(col=>{
+  const lbl = document.createElement('label');
+  lbl.className = 'cols-opt';
+  const cb = document.createElement('input');
+  cb.type = 'checkbox';
+  cb.checked = !state.hiddenCols.has(col.id);
+  cb.dataset.col = col.id;
+  cb.addEventListener('change', ()=>{
+    if(cb.checked) state.hiddenCols.delete(col.id);
+    else state.hiddenCols.add(col.id);
+    saveHiddenCols();
+    applyColVisibility();
+  });
+  lbl.appendChild(cb);
+  lbl.appendChild(document.createTextNode(col.label));
+  colsOpts.appendChild(lbl);
+});
+
+function syncColsChecks(){
+  colsOpts.querySelectorAll('input[type=checkbox]').forEach(cb=>{
+    cb.checked = !state.hiddenCols.has(cb.dataset.col);
+  });
+}
+
+colsBtn.addEventListener('click', (e)=>{
+  e.stopPropagation();
+  colsPanel.classList.toggle('show');
+});
+colsPanel.addEventListener('click', e=>e.stopPropagation());
+document.addEventListener('click', ()=>colsPanel.classList.remove('show'));
+
+document.getElementById('colsAllBtn').addEventListener('click', ()=>{
+  state.hiddenCols.clear();
+  saveHiddenCols();
+  syncColsChecks();
+  applyColVisibility();
+});
+
+// view toggle (list / grid)
+const viewToggle = document.getElementById('viewToggle');
+function syncViewButtons(){
+  viewToggle.querySelectorAll('button').forEach(b=>b.classList.toggle('active', b.dataset.view===state.view));
+}
+viewToggle.querySelectorAll('button').forEach(b=>{
+  b.addEventListener('click', ()=>{
+    if(state.view===b.dataset.view) return;
+    state.view = b.dataset.view;
+    try{ localStorage.setItem('gt7-view', state.view); }catch(e){}
+    syncViewButtons();
+    render();
+  });
+});
+syncViewButtons();
+
+function fmtPrice(p){ return "Cr. " + p.toLocaleString(); }
+
+function getFiltered(){
+  return CARS.filter(c=>{
+    if(!state.groups.has(c.grp)) return false;
+    if(state.manu && c.manu !== state.manu) return false;
+    if(state.dt && c.dt !== state.dt) return false;
+    if(state.asp && c.asp !== state.asp) return false;
+    if(c.pp > state.ppMax) return false;
+    if(c.hp > state.hpMax) return false;
+    if(state.search){
+      const hay = (c.name+" "+c.manu).toLowerCase();
+      if(!hay.includes(state.search)) return false;
+    }
+    return true;
+  });
+}
+
+function render(){
+  let list = getFiltered();
+  const k = state.sortKey, d = state.sortDir;
+  list.sort((a,b)=>{
+    let av = k==='m' ? (a.manu+a.name) : a[k];
+    let bv = k==='m' ? (b.manu+b.name) : b[k];
+    if(av==null && bv==null) return 0;
+    if(av==null) return 1;
+    if(bv==null) return -1;
+    if(k==='disp'){ av = parseFloat(av)||0; bv = parseFloat(bv)||0; }
+    if(typeof av === 'string') return av.localeCompare(bv) * d;
+    return (av-bv) * d;
+  });
+
+  document.querySelectorAll('thead th[data-key]').forEach(th=>{
+    th.classList.toggle('sorted', th.dataset.key===k);
+    th.querySelector('.arrow').textContent = th.dataset.key===k ? (d===1?'▲':'▼') : '';
+  });
+
+  const tableScroll = document.getElementById('tableScroll');
+  const gridEl = document.getElementById('grid');
+  const gridView = state.view === 'grid';
+  tableScroll.style.display = gridView ? 'none' : '';
+  gridEl.classList.toggle('show', gridView);
+
+  if(gridView){
+    renderGrid(list);
+    gridEl.querySelectorAll('input[type=checkbox]').forEach(cb=>{
+      cb.addEventListener('change', ()=>{
+        const id = +cb.dataset.id;
+        if(cb.checked){ if(state.checked.size>=4){ cb.checked=false; return; } state.checked.add(id); }
+        else state.checked.delete(id);
+        cb.closest('.car-card').classList.toggle('checked', cb.checked);
+        renderTray();
+      });
+    });
+    document.getElementById('countShown').textContent = list.length;
+    document.getElementById('countTotal').textContent = CARS.length;
+    applyColVisibility();
+    return;
+  }
+
+  const tbody = document.getElementById('tbody');
+  tbody.innerHTML = '';
+  if(list.length===0){
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="15">No cars match these filters.</td></tr>';
+  }
+  list.forEach(c=>{
+    const tr = document.createElement('tr');
+    tr.className = state.checked.has(c.id) ? 'checked' : '';
+    const iu = imgUrl(c), fb = imgFallbackUrl(c);
+    const imgCell = `<img class="thumb" src="${iu}" alt="${c.name}" loading="lazy" onerror="this.onerror=null;this.src='${fb}';this.onerror=function(){this.replaceWith(Object.assign(document.createElement('div'),{className:'thumb-ph',textContent:'no image'}))};">`;
+    const dispCell = c.disp!=null ? c.disp+' cc' : '<span class="na">—</span>';
+    const powerCell = `${c.hp} HP<br><span class="manu-name">/ ${c.powerRpm.toLocaleString()} rpm</span>`;
+    const torqueCell = `${c.torqueFtLb.toFixed(1)} ft-lb<br><span class="manu-name">/ ${c.torqueRpm.toLocaleString()} rpm · ${c.torqueNm.toFixed(1)} Nm</span>`;
+    const wtCell = `${c.wt.toLocaleString()} kg<br><span class="manu-name">${c.wtLb.toLocaleString()} lbs.</span>`;
+    const lenCell = `${mmToCm(c.lenMm).toFixed(1)} cm<br><span class="manu-name">${c.lenIn}\u2033</span>`;
+    const widCell = `${mmToCm(c.widMm).toFixed(1)} cm<br><span class="manu-name">${c.widIn}\u2033</span>`;
+    const heiCell = `${mmToCm(c.heiMm).toFixed(1)} cm<br><span class="manu-name">${c.heiIn}\u2033</span>`;
+    tr.innerHTML = `
+      <td class="chk"><input type="checkbox" data-id="${c.id}" ${state.checked.has(c.id)?'checked':''}></td>
+      <td class="col-g"><span class="grp-tag ${c.grp.replace('.','')}">${c.grp}</span></td>
+      <td class="col-img">${imgCell}</td>
+      <td class="col-m"><span class="manu-name">${c.manu}</span><span class="model-name">${c.name}</span></td>
+      <td class="col-dt">${c.dt}</td>
+      <td class="col-asp">${c.asp}</td>
+      <td class="num col-disp">${dispCell}</td>
+      <td class="num col-hp">${powerCell}</td>
+      <td class="num col-torque">${torqueCell}</td>
+      <td class="num col-wt">${wtCell}</td>
+      <td class="num col-len">${lenCell}</td>
+      <td class="num col-wid">${widCell}</td>
+      <td class="num col-hei">${heiCell}</td>
+      <td class="num col-pp">${c.pp.toFixed(2)}</td>
+      <td class="num col-pr">${fmtPrice(c.price)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  tbody.querySelectorAll('input[type=checkbox]').forEach(cb=>{
+    cb.addEventListener('change', ()=>{
+      const id = +cb.dataset.id;
+      if(cb.checked){
+        if(state.checked.size>=4){ cb.checked=false; return; }
+        state.checked.add(id);
+      } else state.checked.delete(id);
+      cb.closest('tr').classList.toggle('checked', cb.checked);
+      renderTray();
+    });
+  });
+
+  document.getElementById('countShown').textContent = list.length;
+  document.getElementById('countTotal').textContent = CARS.length;
+
+  applyColVisibility();
+}
+
+// shared per-car rendered values (used by the grid cards)
+function imgCellHtml(c){
+  const iu = imgUrl(c), fb = imgFallbackUrl(c);
+  return `<img class="thumb" src="${iu}" alt="${c.name}" loading="lazy" onerror="this.onerror=null;this.src='${fb}';this.onerror=function(){this.replaceWith(Object.assign(document.createElement('div'),{className:'thumb-ph',textContent:'no image'}))};">`;
+}
+
+function renderGrid(list){
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  if(list.length===0){
+    grid.innerHTML = '<div class="empty-row" style="grid-column:1/-1;text-align:center;color:var(--sub2);padding:30px;">No cars match these filters.</div>';
+    return;
+  }
+  const IN = '″';
+  // spec rows shown under the thumbnail — each tagged with its col id so column toggles apply
+  const specDefs = [
+    ['dt','Drive',   c=>c.dt],
+    ['asp','Asp',    c=>c.asp],
+    ['disp','Displ.',c=>(c.disp!=null ? c.disp+' cc' : '<span class="na">—</span>')],
+    ['hp','Power',   c=>`${c.hp} HP<span class="sub">${c.powerRpm.toLocaleString()} rpm</span>`],
+    ['torque','Torque',c=>`${c.torqueFtLb.toFixed(1)} ft-lb<span class="sub">${c.torqueNm.toFixed(1)} Nm</span>`],
+    ['wt','Weight',  c=>`${c.wt.toLocaleString()} kg<span class="sub">${c.wtLb.toLocaleString()} lbs.</span>`],
+    ['len','Length', c=>`${mmToCm(c.lenMm).toFixed(1)} cm<span class="sub">${c.lenIn}${IN}</span>`],
+    ['wid','Width',  c=>`${mmToCm(c.widMm).toFixed(1)} cm<span class="sub">${c.widIn}${IN}</span>`],
+    ['hei','Height', c=>`${mmToCm(c.heiMm).toFixed(1)} cm<span class="sub">${c.heiIn}${IN}</span>`],
+    ['pp','PP',      c=>c.pp.toFixed(2)],
+    ['pr','Price',   c=>fmtPrice(c.price)],
+  ];
+  list.forEach(c=>{
+    const card = document.createElement('div');
+    card.className = 'car-card' + (state.checked.has(c.id) ? ' checked' : '');
+    const specs = specDefs.map(([id,label,fn])=>
+      `<div class="col-${id}"><dt>${label}</dt><dd>${fn(c)}</dd></div>`
+    ).join('');
+    card.innerHTML = `
+      <div class="card-img col-img">${imgCellHtml(c)}</div>
+      <div class="card-body">
+        <div class="card-top">
+          <label class="card-chk"><input type="checkbox" data-id="${c.id}" ${state.checked.has(c.id)?'checked':''}></label>
+          <div class="col-g"><span class="grp-tag ${c.grp.replace('.','')}">${c.grp}</span></div>
+        </div>
+        <div class="col-m card-name"><span class="manu-name">${c.manu}</span><span class="model-name">${c.name}</span></div>
+        <dl class="card-specs">${specs}</dl>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function renderTray(){
+  const tray = document.getElementById('tray');
+  const chips = document.getElementById('chips');
+  const ids = [...state.checked];
+  tray.classList.toggle('show', ids.length>0);
+  chips.innerHTML = '';
+  ids.forEach(id=>{
+    const c = CARS.find(x=>x.id===id);
+    const chip = document.createElement('div');
+    chip.className = 'chip';
+    chip.innerHTML = `<span>${c.name}</span>`;
+    const btn = document.createElement('button');
+    btn.textContent = '✕';
+    btn.addEventListener('click', ()=>{
+      state.checked.delete(id);
+      renderTray();
+      render();
+    });
+    chip.appendChild(btn);
+    chips.appendChild(chip);
+  });
+  document.getElementById('compareBtn').disabled = ids.length < 2;
+}
+
+document.getElementById('clearBtn').addEventListener('click', ()=>{
+  state.checked.clear(); renderTray(); render();
+});
+
+document.getElementById('compareBtn').addEventListener('click', ()=>{
+  const ids = [...state.checked];
+  const cars = ids.map(id=>CARS.find(c=>c.id===id));
+  const rows = [
+    ['Group', c=>c.grp],
+    ['Manufacturer', c=>c.manu],
+    ['Drivetrain', c=>c.dt],
+    ['Aspiration', c=>c.asp],
+    ['Displacement', c=>c.disp!=null ? c.disp+' cc' : '<span class="na">—</span>'],
+    ['Max Power', c=>`${c.hp} HP / ${c.powerRpm.toLocaleString()} rpm`],
+    ['Max Torque', c=>`${c.torqueFtLb.toFixed(1)} ft-lb / ${c.torqueRpm.toLocaleString()} rpm (${c.torqueNm.toFixed(1)} Nm)`],
+    ['Weight', c=>`${c.wt.toLocaleString()} kg (${c.wtLb.toLocaleString()} lbs.)`],
+    ['Power/Weight', c=>(c.hp/c.wt*1000).toFixed(1)+' HP/t'],
+    ['Length', c=>`${mmToCm(c.lenMm).toFixed(1)} cm (${c.lenIn}\u2033)`],
+    ['Width', c=>`${mmToCm(c.widMm).toFixed(1)} cm (${c.widIn}\u2033)`],
+    ['Height', c=>`${mmToCm(c.heiMm).toFixed(1)} cm (${c.heiIn}\u2033)`],
+    ['PP', c=>c.pp.toFixed(2)],
+    ['Price', c=>fmtPrice(c.price)],
+  ];
+  const imgRow = '<tr><td>Image</td>' + cars.map(c=>{
+    const iu = imgUrl(c), fb = imgFallbackUrl(c);
+    return `<td><img class="thumb" style="width:120px;height:75px;" src="${iu}" onerror="this.onerror=null;this.src='${fb}';"></td>`;
+  }).join('') + '</tr>';
+  let html = '<tr><th>Spec</th>' + cars.map(c=>`<th>${c.name}</th>`).join('') + '</tr>' + imgRow;
+  rows.forEach(([label, fn])=>{
+    html += `<tr><td>${label}</td>` + cars.map(c=>`<td class="num">${fn(c)}</td>`).join('') + '</tr>';
+  });
+  document.getElementById('cmpTable').innerHTML = html;
+  document.getElementById('modalBg').classList.add('show');
+});
+
+document.getElementById('modalClose').addEventListener('click', ()=>{
+  document.getElementById('modalBg').classList.remove('show');
+});
+document.getElementById('modalBg').addEventListener('click', (e)=>{
+  if(e.target.id==='modalBg') document.getElementById('modalBg').classList.remove('show');
+});
+
+render();
+</script>
+</body>
+</html>

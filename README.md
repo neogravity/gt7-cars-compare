@@ -32,8 +32,8 @@ A single-file, zero-dependency web tool to **sort, filter, and side-by-side comp
 
 ```bash
 # Clone, then just open the file — that's it.
-open gt7-compare.html          # macOS
-# or: xdg-open gt7-compare.html # Linux
+open index.html          # macOS
+# or: xdg-open index.html # Linux
 # or double-click it in your file manager
 ```
 
@@ -85,14 +85,14 @@ Your view and column preferences are saved locally in your browser, so they pers
 
 ```
 .
-├── gt7-compare.html   # The entire application (data + CSS + JS, inline)
+├── index.html         # The entire application (data + CSS + JS, inline)
 ├── README.md          # This file
 ├── HANDOVER.md        # Deep-dive developer notes on how the data was extracted
 ├── LICENSE            # MIT (code) + game-data attribution note
 └── .gitignore
 ```
 
-Everything lives in [`gt7-compare.html`](gt7-compare.html). It was kept as a single file deliberately, for maximum portability (email it, drop it on a USB stick, host it as a static asset — it just works).
+Everything lives in [`index.html`](index.html). It was kept as a single file deliberately, for maximum portability (email it, drop it on a USB stick, host it as a static asset — it just works). The `index.html` name also means [GitHub Pages](https://neogravity.github.io/gt7-cars-compare/) serves it as the site root.
 
 ---
 

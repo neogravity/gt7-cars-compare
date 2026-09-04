@@ -2,7 +2,7 @@
 
 ## What this is
 
-`gt7-compare.html` is a single-file, self-contained HTML/CSS/JS tool that lets you sort, filter, and side-by-side compare all 121 racing-class cars in Gran Turismo 7 (Gr.1: 25, Gr.2: 10, Gr.3: 52, Gr.4: 34). No build step, no dependencies — open it directly in a browser.
+`index.html` (formerly `gt7-compare.html`) is a single-file, self-contained HTML/CSS/JS tool that lets you sort, filter, and side-by-side compare all 121 racing-class cars in Gran Turismo 7 (Gr.1: 25, Gr.2: 10, Gr.3: 52, Gr.4: 34). No build step, no dependencies — open it directly in a browser.
 
 Features: sortable columns, group/manufacturer/drivetrain/aspiration filters, PP/power range sliders, search, thumbnail images, and a compare tray (pin up to 4 cars → side-by-side modal).
 
@@ -36,7 +36,7 @@ All spec data (displacement, drivetrain, max power w/ RPM, max torque w/ RPM, we
 
 ## File structure
 
-Currently just one file: `gt7-compare.html`. Everything (data, CSS, JS) is inline.
+Currently just one file: `index.html`. Everything (data, CSS, JS) is inline.
 
 ### `RAW` array (top of the `<script>` block)
 Each row is a fixed-order array — **not** an object — for compactness:
